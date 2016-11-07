@@ -16,6 +16,11 @@
         bool CanSendSms { get; }
 
         /// <summary>
+        ///     Gets a value indicating whether the device can send a sms silently
+        /// </summary>
+        bool CanSendSmsSilently { get; }
+
+        /// <summary>
         ///     Send a sms using the default sms messenger on the device
         /// </summary>
         /// <param name="recipient">Sms recipient</param>
@@ -27,7 +32,7 @@
         void SendSms(string recipient = null, string message = null);
 
         /// <summary>
-        /// Send a sms in background siliently without any prompt or user interaction
+        ///     Send a sms in background siliently without any prompt or user interaction
         /// </summary>
         /// <param name="recipient">Sms recipient</param>
         /// <param name="message">Sms message</param>

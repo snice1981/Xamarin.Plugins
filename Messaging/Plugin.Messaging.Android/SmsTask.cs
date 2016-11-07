@@ -16,7 +16,9 @@ namespace Plugin.Messaging
 
         #region ISmsTask Members
 
-        public bool CanSendSms { get { return true; } }
+        public bool CanSendSms => true;
+
+        public bool CanSendSmsSilently => true;
 
         public void SendSms(string recipient = null, string message = null)
         {
@@ -41,7 +43,7 @@ namespace Plugin.Messaging
         {
             message = message ?? string.Empty;
 
-            if (CanSendSms)
+            if (CanSendSmsSilently)
             {
                 SmsManager smsManager = SmsManager.Default;
                 smsManager.SendTextMessage(recipient, null, message, null, null);

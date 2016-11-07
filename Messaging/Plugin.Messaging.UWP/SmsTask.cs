@@ -1,8 +1,6 @@
 ﻿using System;
 using Windows.ApplicationModel.Chat;
 using Windows.Devices.Sms;
-using System;
-using System.Threading.Tasks;
 
 namespace Plugin.Messaging
 {
@@ -14,7 +12,9 @@ namespace Plugin.Messaging
 
 		#region ISmsTask Members
 
-		public bool CanSendSms { get { return true; } }
+		public bool CanSendSms => true;
+
+		public bool CanSendSmsSilently => true;
 
 		public void SendSms(string recipient = null, string message = null)
 		{
@@ -36,7 +36,7 @@ namespace Plugin.Messaging
 		{
 			message = message ?? string.Empty;
 
-			if (CanSendSms)
+			if (CanSendSmsSilently)
 			{
 				SmsTextMessage2 sendingMessage = new SmsTextMessage2();
 				sendingMessage.Body = message;

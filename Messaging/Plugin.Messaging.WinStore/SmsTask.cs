@@ -10,10 +10,9 @@ namespace Plugin.Messaging
 
         #region ISmsTask Members
 
-        public bool CanSendSms
-        {
-            get { return false; }
-        }
+        public bool CanSendSms => false;
+
+        public bool CanSendSmsSilently => false;
 
         public void SendSms(string recipient, string message)
         {

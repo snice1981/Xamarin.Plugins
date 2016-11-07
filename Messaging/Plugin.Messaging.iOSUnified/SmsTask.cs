@@ -19,10 +19,9 @@ namespace Plugin.Messaging
 
         #region ISmsTask Members
 
-        public bool CanSendSms
-        {
-            get { return MFMessageComposeViewController.CanSendText; }
-        }
+        public bool CanSendSms => MFMessageComposeViewController.CanSendText;
+
+        public bool CanSendSmsSilently => false;
 
         public void SendSms(string recipient = null, string message = null)
         {
