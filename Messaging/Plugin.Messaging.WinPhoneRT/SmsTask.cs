@@ -1,8 +1,5 @@
 using System;
 using Windows.ApplicationModel.Chat;
-using Windows.Devices.Sms;
-using System;
-using System.Threading.Tasks;
 
 namespace Plugin.Messaging
 {
@@ -34,15 +31,7 @@ namespace Plugin.Messaging
 
 	    public void SendSmsSilently(string recipient, string message = null)
 	    {
-		    message = message ?? string.Empty;
-
-		    if (CanSendSms)
-		    {
-			    SmsTextMessage2 sendingMessage = new SmsTextMessage2();
-			    sendingMessage.Body = message;
-			    sendingMessage.To = recipient;
-			    SmsDevice2.GetDefault().SendMessageAndGetResultAsync(sendingMessage).AsTask().Wait();
-			}
+            throw new NotImplementedException();
 	    }
         #endregion
     }
