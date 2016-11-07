@@ -25,5 +25,17 @@
         ///     to be added to the Android manifest.
         /// </remarks>
         void SendSms(string recipient = null, string message = null);
+
+        /// <summary>
+        /// Send a sms in background siliently without any prompt or user interaction
+        /// </summary>
+        /// <param name="recipient">Sms recipient</param>
+        /// <param name="message">Sms message</param>
+        /// <remarks>
+        ///     On Android platform, the android.permission.SEND_SMS needs
+        ///     to be added to the Android manifest.
+        ///     On UWP platform, the cellular capablity needs to be added.
+        /// </remarks>
+        void SendSmsSilently(string recipient, string message = null);
     }
 }

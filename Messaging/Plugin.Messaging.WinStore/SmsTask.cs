@@ -20,6 +20,11 @@ namespace Plugin.Messaging
             throw new PlatformNotSupportedException("Sending SMS not supported on Windows Store");
         }
 
+        public void SendSmsSilently(string recipient, string message = null)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
     }
 }

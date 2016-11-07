@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Phone.Tasks;
 
 namespace Plugin.Messaging
@@ -27,6 +28,11 @@ namespace Plugin.Messaging
 
                 smsComposeTask.Show();
             }
+        }
+
+        public void SendSmsSilently(string recipient, string message = null)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
