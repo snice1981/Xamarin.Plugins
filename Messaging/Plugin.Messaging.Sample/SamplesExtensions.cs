@@ -49,8 +49,7 @@
         {
             if (smsTask.CanSendSms)
             {
-                //smsTask.SendSms("+27213894839493", "Well hello there from Xam.Messaging.Plugin");
-                smsTask.SendSmsSilently("+989122988900", "ITNOA");
+                smsTask.SendSms("+27213894839493", "Well hello there from Xam.Messaging.Plugin");
             }
         }
 
