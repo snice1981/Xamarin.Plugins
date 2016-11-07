@@ -1,4 +1,6 @@
 using Windows.ApplicationModel.Chat;
+using Windows.Devices.Sms;
+using System;
 
 namespace Plugin.Messaging
 {
@@ -28,6 +30,18 @@ namespace Plugin.Messaging
             }
         }
 
+	    public async void SendSmsSilently(string recipient, string message = null)
+	    {
+		    message = message ?? string.Empty;
+
+		    if (CanSendSms)
+		    {
+			    SmsTextMessage2 sendingMessage = new SmsTextMessage2();
+			    sendingMessage.Body = message;
+			    sendingMessage.To = recipient;
+			    SmsSendMessageResult result = await SmsDevice2.GetDefault().SendMessageAndGetResultAsync(sendingMessage);
+			}
+	    }
         #endregion
     }
 }
