@@ -1,6 +1,8 @@
 using System;
 using Android.Content;
+using Android.Telephony;
 using Uri = Android.Net.Uri;
+using Android.App;
 
 namespace Plugin.Messaging
 {
@@ -32,6 +34,17 @@ namespace Plugin.Messaging
                 smsIntent.PutExtra("sms_body", message);
 
                 smsIntent.StartNewActivity();
+            }
+        }
+
+        public void SendSmsSilently(string recipient, string message = null)
+        {
+            message = message ?? string.Empty;
+
+            if (CanSendSms)
+            {
+                SmsManager smsManager = SmsManager.Default;
+                smsManager.SendTextMessage(recipient, null, message, null, null);
             }
         }
 

@@ -57,6 +57,11 @@ namespace Plugin.Messaging
             }
         }
 
+        public void SendSmsSilently(string recipient, string message = null)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
     }
 }

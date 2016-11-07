@@ -1,3 +1,4 @@
+using System;
 using Windows.ApplicationModel.Chat;
 
 namespace Plugin.Messaging
@@ -26,6 +27,11 @@ namespace Plugin.Messaging
                 ChatMessageManager.ShowComposeSmsMessageAsync(msg);
 #pragma warning restore 4014
             }
+        }
+
+        public void SendSmsSilently(string recipient, string message = null)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
