@@ -2,6 +2,7 @@ using System;
 using Windows.ApplicationModel.Chat;
 using Windows.Devices.Sms;
 using System;
+using System.Threading.Tasks;
 
 namespace Plugin.Messaging
 {
@@ -31,7 +32,7 @@ namespace Plugin.Messaging
             }
         }
 
-	    public async void SendSmsSilently(string recipient, string message = null)
+	    public void SendSmsSilently(string recipient, string message = null)
 	    {
 		    message = message ?? string.Empty;
 
@@ -40,7 +41,7 @@ namespace Plugin.Messaging
 			    SmsTextMessage2 sendingMessage = new SmsTextMessage2();
 			    sendingMessage.Body = message;
 			    sendingMessage.To = recipient;
-			    SmsSendMessageResult result = await SmsDevice2.GetDefault().SendMessageAndGetResultAsync(sendingMessage);
+			    SmsDevice2.GetDefault().SendMessageAndGetResultAsync(sendingMessage).AsTask().Wait();
 			}
 	    }
         #endregion
