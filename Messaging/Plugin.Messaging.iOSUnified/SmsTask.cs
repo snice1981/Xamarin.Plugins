@@ -1,6 +1,7 @@
-using System;
 using MessageUI;
-using UIKit;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Plugin.Messaging
 {
@@ -39,7 +40,7 @@ namespace Plugin.Messaging
             }
         }
 
-        public void SendSmsInBackground(string recipient, string message = null)
+        public Task<bool> SendSmsInBackground(string recipient, string message = null, CancellationTokenSource cancellationToken = default)
         {
             throw new PlatformNotSupportedException("Sending SMS in background not supported on iOS");
         }

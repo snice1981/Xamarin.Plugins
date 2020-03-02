@@ -1,4 +1,7 @@
-﻿namespace Plugin.Messaging
+﻿using System.Threading;
+using System.Threading.Tasks;
+
+namespace Plugin.Messaging
 {
     /// <summary>
     ///     Abstraction for sending cross-platform sms messages using
@@ -37,13 +40,14 @@
         /// </summary>
         /// <param name="recipient">Sms recipient</param>
         /// <param name="message">Sms message</param>
+        /// <param name="cancellationToken"></param>
         /// <remarks>
         ///     On UWP platform it requires the cellularMessaging
         ///     capability in the package.appxmanifest file.
         ///     On Android platform, the android.permission.SEND_SMS needs
         ///     to be added to the Android manifest.
         /// </remarks>
-        void SendSmsInBackground(string recipient, string message = null);
+        Task<bool> SendSmsInBackground(string recipient, string message = null, CancellationTokenSource cancellationToken = default);
 
     }
 }
