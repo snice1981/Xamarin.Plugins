@@ -50,11 +50,6 @@ namespace Plugin.Messaging
 
         private SmsSettings Settings { get; }
 
-        public void SendSmsSilently(string recipient, string message = null)
-        {
-            throw new NotImplementedException();
-        }
-
         #endregion
     }
 }
