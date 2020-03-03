@@ -16,9 +16,10 @@
         bool CanSendSms { get; }
 
         /// <summary>
-        ///     Gets a value indicating whether the device can send a sms silently
+        ///     Gets a value indicating whether the device can send a sms
+        ///     without user interaction.
         /// </summary>
-        bool CanSendSmsSilently { get; }
+        bool CanSendSmsInBackground { get; }
 
         /// <summary>
         ///     Send a sms using the default sms messenger on the device
@@ -32,15 +33,17 @@
         void SendSms(string recipient = null, string message = null);
 
         /// <summary>
-        ///     Send a sms in background siliently without any prompt or user interaction
+        ///     Send a sms in the background without user interaction
         /// </summary>
         /// <param name="recipient">Sms recipient</param>
         /// <param name="message">Sms message</param>
         /// <remarks>
+        ///     On UWP platform it requires the cellularMessaging
+        ///     capability in the package.appxmanifest file.
         ///     On Android platform, the android.permission.SEND_SMS needs
         ///     to be added to the Android manifest.
-        ///     On UWP platform, the cellular capablity needs to be added.
         /// </remarks>
-        void SendSmsSilently(string recipient, string message = null);
+        void SendSmsInBackground(string recipient, string message = null);
+
     }
 }

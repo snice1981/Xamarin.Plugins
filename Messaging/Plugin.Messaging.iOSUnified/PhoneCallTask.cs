@@ -1,11 +1,7 @@
 using System;
-#if __UNIFIED__
 using Foundation;
 using UIKit;
-#else
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
-#endif
+using CoreTelephony;
 
 namespace Plugin.Messaging
 {
@@ -21,10 +17,19 @@ namespace Plugin.Messaging
         {
             get
             {
-                // UIApplication.SharedApplication.CanOpenUrl does not validate the URL, it merely checks whether a handler for
-                // the URL has been installed on the system. Therefore string.Empty can be used as phone number.
-                var nsurl = CreateNsUrl(string.Empty);
-                return UIApplication.SharedApplication.CanOpenUrl(nsurl);
+                var nsurl = CreateNsUrl("0000000000");
+                bool canCall = UIApplication.SharedApplication.CanOpenUrl(nsurl);
+
+                if (canCall)
+                {
+                    using (CTTelephonyNetworkInfo netInfo = new CTTelephonyNetworkInfo())
+                    {
+                        string mnc = netInfo.SubscriberCellularProvider?.MobileNetworkCode;
+
+                        return !string.IsNullOrEmpty(mnc) && mnc != "65535"; //65535 stands for NoNetwordProvider
+                    }
+                }
+                return false;
             }
         }
 

@@ -1,8 +1,6 @@
-using System;
 using Android.Content;
+using Android.Net;
 using Android.Telephony;
-using Uri = Android.Net.Uri;
-using Android.App;
 
 namespace Plugin.Messaging
 {
@@ -17,8 +15,7 @@ namespace Plugin.Messaging
         #region ISmsTask Members
 
         public bool CanSendSms => true;
-
-        public bool CanSendSmsSilently => true;
+        public bool CanSendSmsInBackground => true;
 
         public void SendSms(string recipient = null, string message = null)
         {
@@ -31,7 +28,7 @@ namespace Plugin.Messaging
                     smsUri = Uri.Parse("smsto:" + recipient);
                 else
                     smsUri = Uri.Parse("smsto:");
-                
+
                 var smsIntent = new Intent(Intent.ActionSendto, smsUri);
                 smsIntent.PutExtra("sms_body", message);
 
@@ -39,14 +36,15 @@ namespace Plugin.Messaging
             }
         }
 
-        public void SendSmsSilently(string recipient, string message = null)
+        public void SendSmsInBackground(string recipient, string message = null)
         {
             message = message ?? string.Empty;
 
-            if (CanSendSmsSilently)
+            if (CanSendSmsInBackground)
             {
-                SmsManager smsManager = SmsManager.Default;
-                smsManager.SendTextMessage(recipient, null, message, null, null);
+                var smsManager = SmsManager.Default;
+                var msgs = smsManager.DivideMessage(message);
+                smsManager.SendMultipartTextMessage(recipient, null, msgs, null, null);
             }
         }
 

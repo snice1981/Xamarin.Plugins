@@ -1,11 +1,6 @@
 using System;
-#if __UNIFIED__
 using MessageUI;
 using UIKit;
-#else
-using MonoTouch.MessageUI;
-using MonoTouch.UIKit;
-#endif
 
 namespace Plugin.Messaging
 {
@@ -13,15 +8,15 @@ namespace Plugin.Messaging
     {
         private MFMessageComposeViewController _smsController;
 
-        public SmsTask()
+        public SmsTask(SmsSettings settings)
         {
+            Settings = settings;
         }
 
         #region ISmsTask Members
 
         public bool CanSendSms => MFMessageComposeViewController.CanSendText;
-
-        public bool CanSendSmsSilently => false;
+        public bool CanSendSmsInBackground => false;
 
         public void SendSms(string recipient = null, string message = null)
         {
@@ -32,29 +27,28 @@ namespace Plugin.Messaging
                 _smsController = new MFMessageComposeViewController();
 
                 if (!string.IsNullOrWhiteSpace(recipient))
-                    _smsController.Recipients = new[] { recipient };
+                { 
+                    string[] recipients = recipient.Split(';'); 
+                    if (recipients.Length > 0)  
+                        _smsController.Recipients = recipients;
+                }
                 
                 _smsController.Body = message;
 
-                EventHandler<MFMessageComposeResultEventArgs> handler = null;
-                handler = (sender, args) =>
-                {
-                    _smsController.Finished -= handler;
-
-                    var uiViewController = sender as UIViewController;
-                    if (uiViewController == null)
-                    {
-                        throw new ArgumentException("sender");
-                    }
-
-                    uiViewController.DismissViewController(true, () => { });
-                };
-
-                _smsController.Finished += handler;
-
-                _smsController.PresentUsingRootViewController();
+                Settings.SmsPresenter.PresentMessageComposeViewController(_smsController);
             }
         }
+
+        public void SendSmsInBackground(string recipient, string message = null)
+        {
+            throw new PlatformNotSupportedException("Sending SMS in background not supported on iOS");
+        }
+
+        #endregion
+
+        #region Properties
+
+        private SmsSettings Settings { get; }
 
         public void SendSmsSilently(string recipient, string message = null)
         {

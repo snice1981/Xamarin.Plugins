@@ -3,17 +3,15 @@ using System.IO;
 
 namespace Plugin.Messaging
 {
+    /// <inheritdoc />
     public class EmailAttachment : IEmailAttachment
     {
 
-#if WINDOWS_PHONE_APP || WINDOWS_UWP
+#if WINDOWS_UWP
 
         public EmailAttachment(Windows.Storage.IStorageFile file)
         {
-            if (file == null)
-                throw new ArgumentNullException(nameof(file));
-
-            File = file;
+            File = file ?? throw new ArgumentNullException(nameof(file));
             FilePath = file.Path;
             FileName = file.Name;
             ContentType = file.ContentType;
@@ -23,42 +21,44 @@ namespace Plugin.Messaging
 
 #elif __ANDROID__
 
-        public EmailAttachment(string filePath)
+        public EmailAttachment(Java.IO.File file)
         {
-            if (string.IsNullOrWhiteSpace(filePath))
-                throw new ArgumentNullException(nameof(filePath));
+            if (file == null)
+                throw new ArgumentNullException(nameof(file));
 
-            string extension = Android.Webkit.MimeTypeMap.GetFileExtensionFromUrl(filePath);
+            string extension = Android.Webkit.MimeTypeMap.GetFileExtensionFromUrl(file.Path);
             string contentType = Android.Webkit.MimeTypeMap.Singleton.GetMimeTypeFromExtension(extension);
 
-            FilePath = filePath;
-            FileName = Path.GetFileName(filePath);
+            File = file;
+            FilePath = file.Path;
+            FileName = file.Name;
             ContentType = contentType;
         }
+
+        public Java.IO.File File { get; }
 
 #elif __IOS__
 
-        public EmailAttachment(string fileName, Stream content, string contentType)
+        public EmailAttachment(Foundation.NSUrl file)
         {
-            if (string.IsNullOrWhiteSpace(fileName))
-                throw new ArgumentNullException(nameof(fileName));
+            File = file ?? throw new ArgumentNullException(nameof(file));
+            FilePath = file.Path;
+            FileName = Foundation.NSFileManager.DefaultManager.DisplayName(file.Path);
+            string id = MobileCoreServices.UTType.CreatePreferredIdentifier(MobileCoreServices.UTType.TagClassFilenameExtension, file.PathExtension, null);
+            string[] mimeTypes = MobileCoreServices.UTType.CopyAllTags(id, MobileCoreServices.UTType.TagClassMIMEType);
 
-            if (content == null)
-                throw new ArgumentNullException(nameof(content));
-
-            if (string.IsNullOrWhiteSpace(contentType))
-                throw new ArgumentNullException(nameof(contentType));
-
-            FileName = fileName;
-            Content = content;
-            ContentType = contentType;
+            if (mimeTypes.Length > 0)
+                ContentType = mimeTypes[0];
         }
 
-        public Stream Content { get; }
+        public Foundation.NSUrl File { get; }
 #endif
 
-#if !WINDOWS_PHONE_APP || !WINDOWS_UWP
-
+        /// <summary>
+        ///     Create new attachment
+        /// </summary>
+        /// <param name="filePath">Full file path to attachment</param>
+        /// <param name="contentType">Content type for the attachement</param>
         public EmailAttachment(string filePath, string contentType) 
         {
             if (string.IsNullOrWhiteSpace(filePath))
@@ -72,12 +72,15 @@ namespace Plugin.Messaging
             ContentType = contentType;
         }
 
-#endif
-
         #region IEmailAttachment Members
 
+        /// <inheritdoc />
         public string ContentType { get; }
+
+        /// <inheritdoc />
         public string FileName { get; }
+
+        /// <inheritdoc />
         public string FilePath { get; }
 
         #endregion

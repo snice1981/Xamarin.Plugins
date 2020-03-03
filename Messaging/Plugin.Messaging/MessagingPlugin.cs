@@ -3,56 +3,20 @@
 namespace Plugin.Messaging
 {
     /// <summary>
-    ///     Container API for accessing the various Messaging plugin task API's
-    /// </summary>
-    [Obsolete("Use CrossMessaging instead")]
-    public static class MessagingPlugin
-    {
-        #region Properties
-
-        /// <summary>
-        ///     Gets an instance of the platform implementation for the <see cref="IEmailTask" />
-        /// </summary>
-        public static IEmailTask EmailMessenger
-        {
-            get { return CrossMessaging.Current.EmailMessenger; }
-        }
-
-        /// <summary>
-        ///     Gets an instance of the platform implementation for the <see cref="IPhoneCallTask" />
-        /// </summary>
-        public static IPhoneCallTask PhoneDialer
-        {
-            get { return CrossMessaging.Current.PhoneDialer; }
-        }
-
-        /// <summary>
-        ///     Gets an instance of the platform implementation for the <see cref="ISmsTask" />
-        /// </summary>
-        public static ISmsTask SmsMessenger
-        {
-            get { return CrossMessaging.Current.SmsMessenger; }
-        }
-
-        #endregion
-
-        #region Methods
-
-        internal static Exception NotImplementedInReferenceAssembly()
-        {
-            return new NotImplementedException("This functionality is not implemented in the portable version of this assembly.  You should reference the Xam.Plugins.Messaging NuGet package from your main application project in order to reference the platform-specific implementation.");
-        }
-
-        #endregion
-    }
-
-    /// <summary>
     /// Cross platform Messaging implementation
     /// </summary>
     public static class CrossMessaging
     {
         private static readonly Lazy<IMessaging> _implementation = new Lazy<IMessaging>(CreateMessaging, System.Threading.LazyThreadSafetyMode.PublicationOnly);
 
+        /// <summary>
+        /// Gets if the plugin is supported on the current platform.
+        /// </summary>
+        public static bool IsSupported => _implementation.Value != null; 
+
+        /// <summary>
+        ///     Get singleton <see cref="IMessaging"/> instance
+        /// </summary>
         public static IMessaging Current
         {
             get
@@ -68,7 +32,7 @@ namespace Plugin.Messaging
 
         private static IMessaging CreateMessaging()
         {
-#if PORTABLE
+#if NETSTANDARD1_0
             return null;
 #else
             return new MessagingImplementation();
@@ -85,10 +49,20 @@ namespace Plugin.Messaging
     {
         public MessagingImplementation()
         {
-#if PORTABLE
+#if NETSTANDARD1_0
             EmailMessenger = null;
             PhoneDialer = null;
             SmsMessenger = null;
+#elif __ANDROID__
+            Settings = new Settings();
+            EmailMessenger = new EmailTask(Settings.Email);
+            PhoneDialer = new PhoneCallTask(Settings.Phone);
+            SmsMessenger = new SmsTask();            
+#elif __IOS__
+            Settings = new Settings();
+            EmailMessenger = new EmailTask(Settings.Email);
+            PhoneDialer = new PhoneCallTask();
+            SmsMessenger = new SmsTask(Settings.Sms);            
 #else
             EmailMessenger = new EmailTask();
             PhoneDialer = new PhoneCallTask();
@@ -96,8 +70,12 @@ namespace Plugin.Messaging
 #endif
         }
 
+#if __ANDROID__ || __IOS__
+        public Settings Settings { get; }
+#endif
         public IEmailTask EmailMessenger { get; }
         public IPhoneCallTask PhoneDialer { get; }
         public ISmsTask SmsMessenger { get; }
+  
     }
 }

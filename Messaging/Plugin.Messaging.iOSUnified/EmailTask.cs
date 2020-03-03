@@ -1,34 +1,24 @@
 using System;
 using System.Linq;
-#if __UNIFIED__
 using Foundation;
 using MessageUI;
-using UIKit;
-#else
-using MonoTouch.Foundation;
-using MonoTouch.MessageUI;
-using MonoTouch.UIKit;
-#endif
 
 namespace Plugin.Messaging
 {
     internal class EmailTask : IEmailTask
     {
-        public EmailTask()
+        public EmailTask(EmailSettings settings)
         {
+            Settings = settings;
         }
 
-        private MFMailComposeViewController _mailController;
+        //private MFMailComposeViewController _mailController;
 
         #region IEmailTask Members
 
-        public bool CanSendEmail
-        {
-            get { return MFMailComposeViewController.CanSendMail; }
-        }
-
-        public bool CanSendEmailAttachments { get { return true; } }
-        public bool CanSendEmailBodyAsHtml { get { return true; } }
+        public bool CanSendEmail => MFMailComposeViewController.CanSendMail;
+        public bool CanSendEmailAttachments => true;
+        public bool CanSendEmailBodyAsHtml => true;
 
         public void SendEmail(IEmailMessage email)
         {
@@ -37,6 +27,7 @@ namespace Plugin.Messaging
 
             if (CanSendEmail)
             {
+                 MFMailComposeViewController _mailController;                
                 _mailController = new MFMailComposeViewController();
                 _mailController.SetSubject(email.Subject);
                 _mailController.SetMessageBody(email.Message, ((EmailMessage) email).IsHtml);
@@ -50,29 +41,13 @@ namespace Plugin.Messaging
 
                 foreach (var attachment in email.Attachments.Cast<EmailAttachment>())
                 {
-                    if (attachment.Content == null)
+                    if (attachment.File == null)
                         _mailController.AddAttachmentData(NSData.FromFile(attachment.FilePath), attachment.ContentType, attachment.FileName);
                     else
-                        _mailController.AddAttachmentData(NSData.FromStream(attachment.Content), attachment.ContentType, attachment.FileName);
+                        _mailController.AddAttachmentData(NSData.FromUrl(attachment.File), attachment.ContentType, attachment.FileName);
                 }
 
-                EventHandler<MFComposeResultEventArgs> handler = null;
-                handler = (sender, e) =>
-                {
-                    _mailController.Finished -= handler;
-
-                    var uiViewController = sender as UIViewController;
-                    if (uiViewController == null)
-                    {
-                        throw new ArgumentException("sender");
-                    }
-
-                    uiViewController.DismissViewController(true, () => { });
-                };
-
-                _mailController.Finished += handler;
-
-                _mailController.PresentUsingRootViewController();
+                Settings.EmailPresenter.PresentMailComposeViewController(_mailController);
             }
         }
 
@@ -80,6 +55,12 @@ namespace Plugin.Messaging
         {
             SendEmail(new EmailMessage(to, subject, message));
         }
+
+        #endregion
+
+        #region Properties
+
+        private EmailSettings Settings { get; }
 
         #endregion
     }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
+using Foundation;
 using UIKit;
 using Xamarin.Media;
 
@@ -23,7 +25,9 @@ namespace Plugin.Messaging.Sample.iOSUnified
             ButtonSendEmail.TouchUpInside += ButtonSendEmail_TouchUpInside;
             ButtonSendHtmlEmail.TouchUpInside += ButtonSendHtmlEmail_TouchUpInside;
             ButtonSendAttachmentsEmail.TouchUpInside += ButtonSendAttachmentsEmail_TouchUpInside;
+            ButtonSendAttachmentsEmailPcl.TouchUpInside += ButtonSendAttachmentsEmailPcl_TouchUpInside;
             ButtonSendSms.TouchUpInside += ButtonSendSms_TouchUpInside;
+            ButtonSendMultipleSMS.TouchUpInside += ButtonSendMultipleSms_TouchUpInside;
         }
 
         public override void ViewDidDisappear(bool animated)
@@ -34,7 +38,9 @@ namespace Plugin.Messaging.Sample.iOSUnified
             ButtonSendEmail.TouchUpInside -= ButtonSendEmail_TouchUpInside;
             ButtonSendHtmlEmail.TouchUpInside -= ButtonSendHtmlEmail_TouchUpInside;
             ButtonSendAttachmentsEmail.TouchUpInside -= ButtonSendAttachmentsEmail_TouchUpInside;
+            ButtonSendAttachmentsEmailPcl.TouchUpInside -= ButtonSendAttachmentsEmailPcl_TouchUpInside;
             ButtonSendSms.TouchUpInside -= ButtonSendSms_TouchUpInside;
+            ButtonSendMultipleSMS.TouchUpInside -= ButtonSendMultipleSms_TouchUpInside;
         }
 
         #endregion
@@ -58,25 +64,49 @@ namespace Plugin.Messaging.Sample.iOSUnified
 
         private async void ButtonSendAttachmentsEmail_TouchUpInside(object o, EventArgs eventArgs)
         {
-            var mediaPicker = new MediaPicker();
-            MediaFile file = await mediaPicker.PickPhotoAsync();
+            await SendAttachmentsEmail(true);
+        }
 
-            if (file != null)
-            {
-                var fileName = System.IO.Path.GetFileName(file.Path);
-
-                // Assume image content is default jpeg
-                var email = SamplesExtensions.BuildSampleEmail()
-                    .WithAttachment(fileName, file.GetStream(), "image/jpeg")
-                    .Build();
-
-                CrossMessaging.Current.EmailMessenger.SendSampleEmail(email);
-            }
+        private async void ButtonSendAttachmentsEmailPcl_TouchUpInside(object o, EventArgs eventArgs)
+        {
+            await SendAttachmentsEmail(false);
         }
 
         private void ButtonSendSms_TouchUpInside(object o, EventArgs eventArgs)
         {
             CrossMessaging.Current.SmsMessenger.SendSampleSms();
+        }
+
+        private void ButtonSendMultipleSms_TouchUpInside(object o, EventArgs eventArgs)
+        {
+            CrossMessaging.Current.SmsMessenger.SendSampleMultipleSms();
+        }
+
+        private async Task SendAttachmentsEmail(bool usePlatformApi = true)
+        {
+            var mediaPicker = new MediaPicker();
+            MediaFile mediaFile = await mediaPicker.PickPhotoAsync();
+
+            if (mediaFile != null)
+            {
+                IEmailMessage email;
+                if (usePlatformApi)
+                {
+                    NSUrl url = new NSUrl(mediaFile.Path, false);
+                    email = SamplesExtensions.BuildSampleEmail()
+                        .WithAttachment(url)
+                        .Build();
+                }
+                else
+                {
+                    // Hard coded mimetype for sample. Should query file to determine at run-time
+                    email = SamplesExtensions.BuildSampleEmail()
+                        .WithAttachment(mediaFile.Path, @"image/jpeg")
+                        .Build();
+                }
+
+                CrossMessaging.Current.EmailMessenger.SendSampleEmail(email);
+            }
         }
 
         #endregion

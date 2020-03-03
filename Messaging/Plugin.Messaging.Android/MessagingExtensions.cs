@@ -10,7 +10,7 @@ namespace Plugin.Messaging
         public static void StartNewActivity(this Intent intent)
         {
             if (intent == null)
-                throw new ArgumentNullException("intent");
+                throw new ArgumentNullException(nameof(intent));
 
             intent.SetFlags(ActivityFlags.ClearTop);
             intent.SetFlags(ActivityFlags.NewTask);
@@ -19,5 +19,13 @@ namespace Plugin.Messaging
         }
 
         #endregion
+    }
+
+    public static class SettingsExtensions
+    {
+        public static Settings Settings(this IMessaging messaging)
+        {
+            return ((MessagingImplementation)CrossMessaging.Current).Settings;
+        }
     }
 }

@@ -1,12 +1,17 @@
 using System;
-#if __UNIFIED__
+using System.Linq;
 using UIKit;
-#else
-using MonoTouch.UIKit;
-#endif
 
 namespace Plugin.Messaging
 {
+    public static class SettingsExtensions
+    {
+        public static Settings Settings(this IMessaging messaging)
+        {
+            return ((MessagingImplementation)CrossMessaging.Current).Settings;
+        }
+    }
+
     internal static class MessagingExtensions
     {
         #region Methods
@@ -26,32 +31,29 @@ namespace Plugin.Messaging
 
         private static UIViewController GetVisibleViewController(UIViewController controller)
         {
-            if (controller == null)
+            UIViewController viewController = null;
+            UIWindow window = UIApplication.SharedApplication.KeyWindow;
+
+            if (window == null)
+                throw new InvalidOperationException("There's no current active window");
+
+            if (window.WindowLevel == UIWindowLevel.Normal)
+                viewController = window.RootViewController;
+
+            if (viewController == null)
             {
-                controller = UIApplication.SharedApplication.KeyWindow.RootViewController;
+                window = UIApplication.SharedApplication.Windows.OrderByDescending(w => w.WindowLevel)
+                                      .FirstOrDefault(w => w.RootViewController != null && w.WindowLevel == UIWindowLevel.Normal);
+                if (window == null)
+                    throw new InvalidOperationException("Could not find current view controller");
+                else
+                    viewController = window.RootViewController;
             }
 
-            if (controller?.NavigationController?.VisibleViewController != null)
-            {
-                return controller.NavigationController.VisibleViewController;
-            }
-
-            if (controller.IsViewLoaded && controller?.View?.Window != null)
-            {
-                return controller;
-            }
-            else
-            {
-                foreach (var childViewController in controller.ChildViewControllers)
-                {
-                    var foundVisibleViewController = GetVisibleViewController(childViewController);
-                    if (foundVisibleViewController == null)
-                        continue;
-
-                    return foundVisibleViewController;
-                }
-            }
-            return controller;
+            while (viewController.PresentedViewController != null)
+                viewController = viewController.PresentedViewController;
+            
+            return viewController;
         }
 
         #endregion

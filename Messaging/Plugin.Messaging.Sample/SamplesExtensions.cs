@@ -8,7 +8,7 @@
         {
             if (phoneCall.CanMakePhoneCall)
             {
-                phoneCall.MakePhoneCall("+272193343499", "Xamarin Demo User");
+                phoneCall.MakePhoneCall("+27219330000", "Xamarin Demo User");
             }
         }
 
@@ -20,12 +20,9 @@
                 .Bcc(new[] { "bcc1.plugins@xamarin.com", "bcc2.plugins@xamarin.com" })
                 .Subject("Xamarin Messaging Plugin");
 
-#if __ANDROID__ || __IOS__
-
             if (sendAsHtml)
                 builder.BodyAsHtml("Well hello there from <b>Xam.Messaging.Plugin</b>");
-#endif
-            if (!sendAsHtml)
+            else
                 builder.Body("Well hello there from Xam.Messaging.Plugin");
 
             return builder;
@@ -49,7 +46,23 @@
         {
             if (smsTask.CanSendSms)
             {
-                smsTask.SendSms("+27213894839493", "Well hello there from Xam.Messaging.Plugin");
+                smsTask.SendSms("+27219330000", "Well hello there from Xam.Messaging.Plugin.  Some special characters. ÇÇẪ");
+            }
+        }
+
+        public static void SendSampleBackgroundSms(this ISmsTask smsTask)
+        {
+            if (smsTask.CanSendSmsInBackground)
+            {
+                smsTask.SendSmsInBackground("+27219330000", "Well hello there from Xam.Messaging.Plugin. Some special characters. ÇÇẪ");
+            }
+        }
+
+        public static void SendSampleMultipleSms(this ISmsTask smsTask)
+        {
+            if (smsTask.CanSendSms)
+            {
+                smsTask.SendSms("+27219330000;+27219330001", "Well hello there from Xam.Messaging.Plugin");
             }
         }
 
