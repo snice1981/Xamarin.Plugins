@@ -4,6 +4,12 @@ using System.Threading.Tasks;
 namespace Plugin.Messaging
 {
     /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="result"></param>
+    public delegate void SmsDeliveryResult(bool isSuccessful);
+
+    /// <summary>
     ///     Abstraction for sending cross-platform sms messages using
     ///     the default sms messenger on the device.
     /// </summary>
@@ -47,7 +53,9 @@ namespace Plugin.Messaging
         ///     On Android platform, the android.permission.SEND_SMS needs
         ///     to be added to the Android manifest.
         /// </remarks>
-        Task<bool> SendSmsInBackground(string recipient, string message = null, CancellationTokenSource cancellationToken = default);
+        void SendSmsInBackground(string recipient, string message = null);
 
+
+        event SmsDeliveryResult OnSmsDeliveryResult;
     }
 }

@@ -1,6 +1,4 @@
 using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Tizen.Messaging.Messages;
 
 namespace Plugin.Messaging
@@ -10,6 +8,8 @@ namespace Plugin.Messaging
 		public SmsTask()
 		{
 		}
+
+        public event SmsDeliveryResult OnSmsDeliveryResult;
 
 		public bool CanSendSms => true;
 
@@ -32,7 +32,7 @@ namespace Plugin.Messaging
 			}
 		}
 
-		public Task<bool> SendSmsInBackground(string recipient, string message = null, CancellationTokenSource cancellationToken = default)
+		public void SendSmsInBackground(string recipient, string message = null)
 		{
 			throw new PlatformNotSupportedException("Sending SMS in background not supported on Tizen");
 		}

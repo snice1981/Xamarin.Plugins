@@ -1,7 +1,5 @@
 using MessageUI;
 using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Plugin.Messaging
 {
@@ -15,6 +13,8 @@ namespace Plugin.Messaging
         }
 
         #region ISmsTask Members
+
+        public event SmsDeliveryResult OnSmsDeliveryResult;
 
         public bool CanSendSms => MFMessageComposeViewController.CanSendText;
         public bool CanSendSmsInBackground => false;
@@ -40,7 +40,7 @@ namespace Plugin.Messaging
             }
         }
 
-        public Task<bool> SendSmsInBackground(string recipient, string message = null, CancellationTokenSource cancellationToken = default)
+        public void SendSmsInBackground(string recipient, string message = null)
         {
             throw new PlatformNotSupportedException("Sending SMS in background not supported on iOS");
         }
