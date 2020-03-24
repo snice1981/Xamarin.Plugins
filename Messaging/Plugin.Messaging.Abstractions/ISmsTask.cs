@@ -1,14 +1,11 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-
-namespace Plugin.Messaging
+﻿namespace Plugin.Messaging
 {
     /// <summary>
-    /// 
+    /// Represents a method that will handle an event that is raised when an SMS was or wasn't delivered.
     /// </summary>
-    /// <param name="result"></param>
+    /// <param name="isSuccessful"></param>
     public delegate void SmsDeliveryResult(bool isSuccessful);
-
+    
     /// <summary>
     ///     Abstraction for sending cross-platform sms messages using
     ///     the default sms messenger on the device.
@@ -46,7 +43,6 @@ namespace Plugin.Messaging
         /// </summary>
         /// <param name="recipient">Sms recipient</param>
         /// <param name="message">Sms message</param>
-        /// <param name="cancellationToken"></param>
         /// <remarks>
         ///     On UWP platform it requires the cellularMessaging
         ///     capability in the package.appxmanifest file.
@@ -56,6 +52,9 @@ namespace Plugin.Messaging
         void SendSmsInBackground(string recipient, string message = null);
 
 
+        /// <summary>
+        /// An event raised when the SMS is either delivered successfully or failed to be delivered.
+        /// </summary>
         event SmsDeliveryResult OnSmsDeliveryResult;
     }
 }
