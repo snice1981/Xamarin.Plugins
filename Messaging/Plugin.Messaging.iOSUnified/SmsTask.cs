@@ -17,6 +17,7 @@ namespace Plugin.Messaging
         public event SmsDeliveryResult OnSmsDeliveryResult;
 
         public bool CanSendSms => MFMessageComposeViewController.CanSendText;
+
         public bool CanSendSmsInBackground => false;
 
         public void SendSms(string recipient = null, string message = null)

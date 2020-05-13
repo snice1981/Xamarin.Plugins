@@ -2,6 +2,7 @@ using Android.App;
 using Android.Content;
 using Android.Net;
 using Android.Telephony;
+using System.Collections.Generic;
 
 namespace Plugin.Messaging
 {
@@ -9,10 +10,6 @@ namespace Plugin.Messaging
 
     internal class SmsTask : BroadcastReceiver, ISmsTask
     {
-        public SmsTask()
-        {
-        }
-
         public override void OnReceive(Context context, Intent intent)
         {
             var action = intent?.Action;
@@ -28,7 +25,12 @@ namespace Plugin.Messaging
             }
             else if (action == SMS_DELIVERY_INTENT_ACTION && result == Result.Ok)
             {
-                OnReceiveAction(true);
+                _numberOfDeliveredMessageParts++;
+
+                if (_numberOfDeliveredMessageParts >= _numberOfSmsMessageParts)
+                {
+                    OnReceiveAction(true);
+                }
             }
         }
 
@@ -72,13 +74,28 @@ namespace Plugin.Messaging
 
             _smsManager = SmsManager.Default;
 
-            var piSent = PendingIntent.GetBroadcast(CONTEXT, 0, new Intent(SMS_SENT_INTENT_ACTION), 0);
-            var piDelivered = PendingIntent.GetBroadcast(CONTEXT, 0, new Intent(SMS_DELIVERY_INTENT_ACTION), 0);
-
             CONTEXT.RegisterReceiver(this, new IntentFilter(SMS_SENT_INTENT_ACTION));
             CONTEXT.RegisterReceiver(this, new IntentFilter(SMS_DELIVERY_INTENT_ACTION));
 
-            _smsManager.SendTextMessage(recipient, null, message, piSent, piDelivered);
+            IList<string> messageParts = _smsManager.DivideMessage(message);
+
+            _numberOfSmsMessageParts = messageParts.Count;
+
+            _numberOfDeliveredMessageParts = 0;
+
+            var sentPendingIntents = new List<PendingIntent>();
+            var deliveryPendingIntents = new List<PendingIntent>();
+
+            var sentPendingIntent = PendingIntent.GetBroadcast(CONTEXT, 0, new Intent(SMS_SENT_INTENT_ACTION), 0);
+            var deliveredPendingIntent = PendingIntent.GetBroadcast(CONTEXT, 0, new Intent(SMS_DELIVERY_INTENT_ACTION), 0);
+
+            for (int i = 0; i < _numberOfSmsMessageParts; i++)
+            {
+                sentPendingIntents.Add(sentPendingIntent);
+                deliveryPendingIntents.Add(deliveredPendingIntent);
+            }
+
+            _smsManager.SendMultipartTextMessage(recipient, null, messageParts, sentPendingIntents, deliveryPendingIntents);
         }
 
         #endregion
@@ -107,10 +124,12 @@ namespace Plugin.Messaging
 
         #region Private Field
 
-        private const string SMS_DELIVERY_INTENT_ACTION = "BSN.Resa.DoctorApp.SMS_Delivery";
-        private const string SMS_SENT_INTENT_ACTION = "BSN.Resa.DoctorApp.SMS_SEND";
+        private static readonly string SMS_DELIVERY_INTENT_ACTION = $"{Application.Context.PackageName}.Action_SMS_Delivery";
+        private static readonly string SMS_SENT_INTENT_ACTION = $"{Application.Context.PackageName}.Action_SMS_SEND";
         private SmsManager _smsManager;
         private static readonly Context CONTEXT = Application.Context;
+        private int _numberOfSmsMessageParts;
+        private int _numberOfDeliveredMessageParts;
 
         #endregion
     }
