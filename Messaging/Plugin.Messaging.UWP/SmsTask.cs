@@ -50,6 +50,8 @@ namespace Plugin.Messaging
             }
         }
 
+        public event SmsDeliveryResult OnSmsDeliveryResult;
+
         #endregion
     }
 }

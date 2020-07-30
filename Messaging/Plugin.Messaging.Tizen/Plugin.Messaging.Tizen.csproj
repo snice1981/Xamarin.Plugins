@@ -7,6 +7,8 @@
     <AssemblyName>Plugin.Messaging</AssemblyName>
     <RootNamespace>Plugin.Messaging</RootNamespace>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	<TargetFrameworkIdentifier>Tizen</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">

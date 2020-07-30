@@ -9,6 +9,8 @@ namespace Plugin.Messaging
 		{
 		}
 
+        public event SmsDeliveryResult OnSmsDeliveryResult;
+
 		public bool CanSendSms => true;
 
 	    public bool CanSendSmsInBackground => false;
