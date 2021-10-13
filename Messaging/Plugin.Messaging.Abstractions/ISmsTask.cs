@@ -1,6 +1,12 @@
 ﻿namespace Plugin.Messaging
 {
     /// <summary>
+    /// Represents a method that will handle an event that is raised when an SMS was or wasn't delivered.
+    /// </summary>
+    /// <param name="isSuccessful"></param>
+    public delegate void SmsDeliveryResult(bool isSuccessful);
+    
+    /// <summary>
     ///     Abstraction for sending cross-platform sms messages using
     ///     the default sms messenger on the device.
     /// </summary>
@@ -45,5 +51,10 @@
         /// </remarks>
         void SendSmsInBackground(string recipient, string message = null);
 
+
+        /// <summary>
+        /// An event raised when the SMS is either delivered successfully or failed to be delivered.
+        /// </summary>
+        event SmsDeliveryResult OnSmsDeliveryResult;
     }
 }

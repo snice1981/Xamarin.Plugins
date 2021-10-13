@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27004.2009
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin.Messaging.Abstractions", "Plugin.Messaging.Abstractions\Plugin.Messaging.Abstractions.csproj", "{B4292775-3BB9-4FF2-8D20-B3D483BF1701}"
 EndProject
@@ -35,9 +35,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin.Messaging.Tizen", "P
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Plugin.Messaging.Shared\Plugin.Messaging.Shared.projitems*{1b90d67a-34ef-4e81-bac6-72c117c3643f}*SharedItemsImports = 5
 		Plugin.Messaging.Shared\Plugin.Messaging.Shared.projitems*{4cddcb48-ad3f-4c62-ad13-c004260df40b}*SharedItemsImports = 4
 		Plugin.Messaging.Shared\Plugin.Messaging.Shared.projitems*{805582fd-96e6-47b9-88ad-aeb97e2226c8}*SharedItemsImports = 4
 		Plugin.Messaging.Shared\Plugin.Messaging.Shared.projitems*{aca97c41-09fc-409d-848e-dd3acdc7a57b}*SharedItemsImports = 13
+		Plugin.Messaging.Shared\Plugin.Messaging.Shared.projitems*{b4292775-3bb9-4ff2-8d20-b3d483bf1701}*SharedItemsImports = 5
+		Plugin.Messaging.Shared\Plugin.Messaging.Shared.projitems*{c6f016a4-776a-43e6-9116-010aee530e30}*SharedItemsImports = 5
 		Plugin.Messaging.Shared\Plugin.Messaging.Shared.projitems*{f419ad4f-942a-4fe7-8e90-6e15bd85c1d0}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

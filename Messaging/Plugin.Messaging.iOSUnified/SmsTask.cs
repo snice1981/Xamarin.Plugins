@@ -1,6 +1,5 @@
-using System;
 using MessageUI;
-using UIKit;
+using System;
 
 namespace Plugin.Messaging
 {
@@ -15,7 +14,10 @@ namespace Plugin.Messaging
 
         #region ISmsTask Members
 
+        public event SmsDeliveryResult OnSmsDeliveryResult;
+
         public bool CanSendSms => MFMessageComposeViewController.CanSendText;
+
         public bool CanSendSmsInBackground => false;
 
         public void SendSms(string recipient = null, string message = null)
