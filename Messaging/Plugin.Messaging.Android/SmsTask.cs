@@ -14,14 +14,19 @@ namespace Plugin.Messaging
         {
             var action = intent?.Action;
             var result = ResultCode;
+            var recipient = intent.GetStringExtra("recipient");
+            var message = intent.GetStringExtra("message");
+            int id = intent.GetIntExtra("smsId", -1);
+
+            int? smsId = id == -1 ? null : (int?)id;
 
             if (action == SMS_SENT_INTENT_ACTION && result != Result.Ok)
             {
-                OnReceiveAction(false);
+                OnSMSSentAction(false, recipient, message, smsId);
             }
             else if (action == SMS_DELIVERY_INTENT_ACTION && result != Result.Ok)
             {
-                OnReceiveAction(false);
+                OnSMSDeliveryAction(false, recipient, message, smsId);
             }
             else if (action == SMS_DELIVERY_INTENT_ACTION && result == Result.Ok)
             {
@@ -29,7 +34,7 @@ namespace Plugin.Messaging
 
                 if (_numberOfDeliveredMessageParts >= _numberOfSmsMessageParts)
                 {
-                    OnReceiveAction(true);
+                    OnSMSDeliveryAction(true, recipient, message, smsId);
                 }
             }
         }
@@ -37,6 +42,7 @@ namespace Plugin.Messaging
         #region ISmsTask Members
 
         public event SmsDeliveryResult OnSmsDeliveryResult;
+        public event SmsDeliveryResult OnSmsSentResult;
 
         public bool CanSendSms => true;
 
@@ -61,11 +67,11 @@ namespace Plugin.Messaging
             }
         }
 
-        public void SendSmsInBackground(string recipient, string message = null)
+        public void SendSmsInBackground(string recipient, string message = null, int? smsId = null)
         {
             if (!CanSendSmsInBackground)
             {
-                OnSmsDeliveryResult?.Invoke(isSuccessful: false);
+                OnSmsDeliveryResult?.Invoke(isSuccessful: false, recipient, message, smsId);
 
                 return;
             }
@@ -86,8 +92,22 @@ namespace Plugin.Messaging
             var sentPendingIntents = new List<PendingIntent>();
             var deliveryPendingIntents = new List<PendingIntent>();
 
-            var sentPendingIntent = PendingIntent.GetBroadcast(CONTEXT, 0, new Intent(SMS_SENT_INTENT_ACTION), 0);
-            var deliveredPendingIntent = PendingIntent.GetBroadcast(CONTEXT, 0, new Intent(SMS_DELIVERY_INTENT_ACTION), 0);
+            var sentIntent = new Intent(SMS_SENT_INTENT_ACTION);
+            sentIntent.PutExtra("recipient", recipient);
+            sentIntent.PutExtra("message", message);            
+
+            var deliveredIntent = new Intent(SMS_DELIVERY_INTENT_ACTION);
+            deliveredIntent.PutExtra("recipient", recipient);
+            deliveredIntent.PutExtra("message", message);
+
+            if (smsId != null)
+            {
+                sentIntent.PutExtra("smsId", (int)smsId);
+                deliveredIntent.PutExtra("smsId", (int)smsId);
+            }
+
+            var sentPendingIntent = PendingIntent.GetBroadcast(CONTEXT, 0, sentIntent, PendingIntentFlags.OneShot);
+            var deliveredPendingIntent = PendingIntent.GetBroadcast(CONTEXT, 0, deliveredIntent, PendingIntentFlags.OneShot);
 
             for (int i = 0; i < _numberOfSmsMessageParts; i++)
             {
@@ -102,11 +122,18 @@ namespace Plugin.Messaging
 
         #region Private Methods
 
-        private void OnReceiveAction(bool result)
+        private void OnSMSDeliveryAction(bool success, string recipient, string message, int? smsId)
         {
             UnRegisterBroadcastReceiver();
 
-            OnSmsDeliveryResult?.Invoke(isSuccessful:result);
+            OnSmsDeliveryResult?.Invoke(isSuccessful:success, recipient, message, smsId);
+        }
+
+        private void OnSMSSentAction(bool success, string recipient, string message, int? smsId)
+        {
+            UnRegisterBroadcastReceiver();
+
+            OnSmsSentResult?.Invoke(isSuccessful: success, recipient, message, smsId);
         }
 
         private void UnRegisterBroadcastReceiver()

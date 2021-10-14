@@ -15,6 +15,7 @@ namespace Plugin.Messaging
         #region ISmsTask Members
 
         public event SmsDeliveryResult OnSmsDeliveryResult;
+        public event SmsDeliveryResult OnSmsSentResult;
 
         public bool CanSendSms => MFMessageComposeViewController.CanSendText;
 
@@ -41,7 +42,7 @@ namespace Plugin.Messaging
             }
         }
 
-        public void SendSmsInBackground(string recipient, string message = null)
+        public void SendSmsInBackground(string recipient, string message = null, int? smsId = null)
         {
             throw new PlatformNotSupportedException("Sending SMS in background not supported on iOS");
         }
